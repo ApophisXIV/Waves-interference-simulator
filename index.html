@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Waves interference mapping</title>
+	</head>
+	<body>
+		<h1>Waves interference mapping</h1>
+		<span id="location">Midiendo...</span>
+
+		<script>
+			const location_label = document.querySelector("#location");
+
+			if (!"geolocation" in navigator) {
+				location_label.innerHTML = "No está disponible la geolocalización en tu dispositivo :(";
+				throw new Error("Geolocation is not available");
+			}
+
+			const gps_options = {
+				enableHighAccuracy: true,
+				maximumAge: 0,
+				timeout: 30000,
+			};
+
+			let measurements = [];
+			const actual_location_id = navigator.geolocation.watchPosition(
+				(position) => {
+					measurements.push({
+						longitude: position.coords.longitude,
+						latitude: position.coords.latitude,
+						timestamp: position.timestamp,
+					});
+
+					const last_measurement = measurements[measurements.length - 2];
+					location_label.innerHTML = `
+			                     <p>Latitud: ${position.coords.latitude}</p>
+			                     <p>Longitud: ${position.coords.longitude} </p>
+			                     <p>Altitud: ${position.coords.altitude}</p>
+			                     <p>Precision: ${position.coords.accuracy} m</p>
+			                     <p>Timestamp: ${position.timestamp} ms</p>
+			                     <p>Fecha: ${new Date(position.timestamp)}</p>
+			                     <p>Ultima medicion:</p>
+			                     <ul>
+			                         <li>${last_measurement.latitude}</li>
+			                         <li>${last_measurement.longitude}</li>
+			                         <li>${last_measurement.timestamp}</li>
+			                     </ul>
+			                 `;
+				},
+				undefined,
+				gps_options
+			);
+		</script>
+	</body>
+</html>
